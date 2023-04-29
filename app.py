@@ -96,21 +96,23 @@ def login():
     if form.validate_on_submit():
         email = form.email.data
         password = form.password.data
-        cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM users WHERE email = %s AND password = %s", (email, password))
-        user = cur.fetchone()
-        cur.close()
-        if user:
-            session['email'] = user['email']
-            return redirect(url_for('success'))
+        mycursor = mydb.cursor()
+        mycursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+        user = mycursor.fetchone()
+        mycursor.close()
+        if user and bcrypt.check_password_hash(user[3], password):
+            session['email'] = user[2]
+            return redirect(url_for('index'))
         else:
             return render_template('login.html', form=form, error='Invalid email or password')
     return render_template('login.html', form=form)
 
+
+
 @app.route('/logout')
 def logout():
     session.pop('email', None)
-    return redirect(url_for('register'))
+    return redirect(url_for('login'))
 
 @app.route('/recommend', methods=['POST'])
 def recommend():

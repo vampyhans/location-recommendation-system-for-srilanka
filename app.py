@@ -4,6 +4,7 @@ import numpy as np
 import os
 from forms import RegistrationForm, LoginForm
 from flask_bcrypt import Bcrypt
+from functools import wraps
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import LabelEncoder
 from sklearn.neighbors import NearestNeighbors
@@ -65,8 +66,17 @@ user_item = pd.pivot_table(df, values='Grade', index='Reviewer_Nationality', col
 knn = NearestNeighbors(metric='cosine', algorithm='brute', n_neighbors=5)
 knn.fit(user_item)
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'email' not in session:
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 
 @app.route('/')
+@login_required
 def index():
 
     input_types = hf['Type'].unique().tolist()
@@ -115,6 +125,7 @@ def logout():
     return redirect(url_for('login'))
 
 @app.route('/recommend', methods=['POST'])
+@login_required
 def recommend():
 
     # Get user inputs

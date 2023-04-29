@@ -4,6 +4,7 @@ import numpy as np
 import os
 from forms import RegistrationForm, LoginForm
 from flask_bcrypt import Bcrypt
+from functools import wraps
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import LabelEncoder
 from sklearn.neighbors import NearestNeighbors
@@ -65,8 +66,17 @@ user_item = pd.pivot_table(df, values='Grade', index='Reviewer_Nationality', col
 knn = NearestNeighbors(metric='cosine', algorithm='brute', n_neighbors=5)
 knn.fit(user_item)
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'email' not in session:
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 
 @app.route('/')
+@login_required
 def index():
 
     input_types = hf['Type'].unique().tolist()
@@ -96,23 +106,26 @@ def login():
     if form.validate_on_submit():
         email = form.email.data
         password = form.password.data
-        cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM users WHERE email = %s AND password = %s", (email, password))
-        user = cur.fetchone()
-        cur.close()
-        if user:
-            session['email'] = user['email']
-            return redirect(url_for('success'))
+        mycursor = mydb.cursor()
+        mycursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+        user = mycursor.fetchone()
+        mycursor.close()
+        if user and bcrypt.check_password_hash(user[3], password):
+            session['email'] = user[2]
+            return redirect(url_for('index'))
         else:
             return render_template('login.html', form=form, error='Invalid email or password')
     return render_template('login.html', form=form)
 
+
+
 @app.route('/logout')
 def logout():
     session.pop('email', None)
-    return redirect(url_for('register'))
+    return redirect(url_for('login'))
 
 @app.route('/recommend', methods=['POST'])
+@login_required
 def recommend():
 
     # Get user inputs

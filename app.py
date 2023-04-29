@@ -68,7 +68,7 @@ def index():
     input_districts = hf['District'].unique().tolist()
     reviewer_nationalities = hf['Reviewer_Nationality'].unique().tolist()
 
-    return render_template('index.html', input_types=input_types, input_grades=input_grades, input_districts=input_districts, reviewer_nationalities=reviewer_nationalities)
+    return render_template('get-recommendations.html', input_types=input_types, input_grades=input_grades, input_districts=input_districts, reviewer_nationalities=reviewer_nationalities)
 
 @app.route('/recommend', methods=['POST'])
 def recommend():

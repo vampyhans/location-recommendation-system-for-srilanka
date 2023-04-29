@@ -1,14 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Location recommendation</title>
-  </head>
-  <body>
-    <h1>Enter your preferences:</h1>
-    <form method="POST" action="/recommend">
+{% extends "base.html" %}
+
+{% block title %}About Us{% endblock %}
+
+{% block content %}
+  <h2>Enter your preferences:</h2>
+  <form method="POST" action="/recommend">
 
 		<label for="input_type">Type of location:</label><br>
         <select id="input_type" name="input_type">
@@ -38,5 +34,4 @@
 
       <input type="submit" value="Submit" />
     </form>
-  </body>
-</html>
+{% endblock %}

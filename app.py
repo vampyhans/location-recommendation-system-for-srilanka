@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import pandas as pd
 import numpy as np
 import os
-from forms import RegistrationForm
+from forms import RegistrationForm, LoginForm
 from flask_bcrypt import Bcrypt
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import LabelEncoder
@@ -89,6 +89,28 @@ def register():
         mycursor.close()
         return redirect(url_for('index'))
     return render_template('register.html', form=form)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        email = form.email.data
+        password = form.password.data
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT * FROM users WHERE email = %s AND password = %s", (email, password))
+        user = cur.fetchone()
+        cur.close()
+        if user:
+            session['email'] = user['email']
+            return redirect(url_for('success'))
+        else:
+            return render_template('login.html', form=form, error='Invalid email or password')
+    return render_template('login.html', form=form)
+
+@app.route('/logout')
+def logout():
+    session.pop('email', None)
+    return redirect(url_for('register'))
 
 @app.route('/recommend', methods=['POST'])
 def recommend():

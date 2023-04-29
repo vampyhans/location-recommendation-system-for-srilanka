@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Location recommendation</title>
+  </head>
+  <body>
+    <h1>Enter your preferences:</h1>
+    <form method="POST" action="/recommend">
+
+		<label for="input_type">Type of location:</label><br>
+        <select id="input_type" name="input_type">
+            {% for type in input_types %}
+            <option value="{{ type }}">{{ type }}</option>
+            {% endfor %}
+        </select><br><br>
+        <label for="input_grade">Grade of location:</label><br>
+        <select id="input_grade" name="input_grade">
+            {% for grade in input_grades %}
+            <option value="{{ grade }}">{{ grade }}</option>
+            {% endfor %}
+        </select><br><br>
+        <label for="input_district">District of location:</label><br>
+        <select id="input_district" name="input_district">
+            {% for district in input_districts %}
+            <option value="{{ district }}">{{ district }}</option>
+            {% endfor %}
+        </select><br><br>
+        <label for="input_nationality">Reviewer Nationality:</label><br>
+        <select id="input_nationality" name="input_nationality">
+            {% for nationality in reviewer_nationalities %}
+            <option value="{{ nationality }}">{{ nationality }}</option>
+            {% endfor %}
+        </select><br><br>
+
+
+      <input type="submit" value="Submit" />
+    </form>
+  </body>
+</html>

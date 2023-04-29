@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Recommended Locations</title>
+</head>
+<body>
+	<h1>Recommended Locations:</h1>
+	{% if top_rec_names|length > 0 %}
+		<ul>
+			{% for recommendation in top_rec_names %}
+				<li>{{ recommendation }}</li>
+			{% endfor %}
+		</ul>
+	{% else %}
+		<p>No recommendations
+	{% endif %}
+</body>
+</html>

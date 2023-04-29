@@ -1,6 +1,9 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for, session
 import pandas as pd
 import numpy as np
+import os
+from forms import RegistrationForm
+from flask_bcrypt import Bcrypt
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import LabelEncoder
 from sklearn.neighbors import NearestNeighbors
@@ -11,7 +14,8 @@ app = Flask(__name__)
 # Load dataset
 # Load dataset from MySQL database
 
-
+SECRET_KEY = os.urandom(32)
+app.config['SECRET_KEY'] = SECRET_KEY
 mydb = mysql.connector.connect(
   host="localhost",
   user="root",
@@ -24,6 +28,8 @@ mycursor = mydb.cursor()
 mycursor.execute("SELECT Type, Name, Grade, District, Reviewer_Nationality, Lat, Lon FROM locations")
 
 myresult = mycursor.fetchall()
+
+bcrypt = Bcrypt(app)
 
 df = pd.DataFrame(myresult, columns=['Type', 'Name', 'Grade', 'District', 'Reviewer_Nationality', 'Lat', 'Lon'])
 
@@ -69,6 +75,20 @@ def index():
     reviewer_nationalities = hf['Reviewer_Nationality'].unique().tolist()
 
     return render_template('get-recommendations.html', input_types=input_types, input_grades=input_grades, input_districts=input_districts, reviewer_nationalities=reviewer_nationalities)
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        email = form.email.data
+        password = form.password.data
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+        mycursor.execute("INSERT INTO users (username, email, password) VALUES (%s, %s, %s)", (username, email, hashed_password))
+        mydb.commit()  # fix here
+        mycursor.close()
+        return redirect(url_for('index'))
+    return render_template('register.html', form=form)
 
 @app.route('/recommend', methods=['POST'])
 def recommend():

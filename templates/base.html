@@ -4,27 +4,76 @@
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{% block title %}{% endblock %}</title>
-        <link rel="stylesheet" href="assets/css/main/app.css">
-        <link rel="stylesheet" href="assets/css/pages/auth.css">
-        <link rel="shortcut icon" href="assets/images/logo/favicon.svg" type="image/x-icon">
-        <link rel="shortcut icon" href="assets/images/logo/favicon.png" type="image/png">
+        <link rel="stylesheet" href="static/css/main/app.css">
+        <link rel="shortcut icon" href="static/images/logo/favicon.svg" type="image/x-icon">
+        <link rel="shortcut icon" href="static/images/logo/favicon.png" type="image/png">
+        
+    <link rel="stylesheet" href="static/css/shared/iconly.css">
       </head>
       <body>
-        <header>
-          <h1>Location recommendation</h1>
-          <nav>
-            <ul>
-              <li><a href="/">Home</a></li>
-              <li><a href="/about">About</a></li>
-              <li><a href="/contact">Contact</a></li>
-            </ul>
-          </nav>
-        </header>
-        <main>
-          {% block content %}{% endblock %}
-        </main>
-        <footer>
-          <p>&copy; 2023 Hansa Wijesinghe</p>
-        </footer>
+
+        <div id="app">
+          <div id="main" class="layout-horizontal">
+              <header class="mb-5">
+                  <div class="header-top">
+                      <div class="container">
+                          <div class="logo">
+                              <a href="index.html"><img src="assets/images/logo/logo.svg" alt="Logo"></a>
+                          </div>
+                          <div class="header-top-right">
+  
+                              <div class="dropdown">
+                                  <a href="#" id="topbarUserDropdown" class="user-dropdown d-flex align-items-center dropend dropdown-toggle " data-bs-toggle="dropdown" aria-expanded="false">
+                                      <div class="avatar avatar-md2" >
+                                          <img src="assets/images/faces/1.jpg" alt="Avatar">
+                                      </div>
+                                      <div class="text">
+                                          <h6 class="user-dropdown-name">John Ducky</h6>
+                                          <p class="user-dropdown-status text-sm text-muted">Member</p>
+                                      </div>
+                                  </a>
+                                  <ul class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="topbarUserDropdown">
+                                    <li><a class="dropdown-item" href="#">My Account</a></li>
+                                    <li><a class="dropdown-item" href="#">Settings</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="auth-login.html">Logout</a></li>
+                                  </ul>
+                              </div>
+  
+                              <!-- Burger button responsive -->
+                              <a href="#" class="burger-btn d-block d-xl-none">
+                                  <i class="bi bi-justify fs-3"></i>
+                              </a>
+                          </div>
+                      </div>
+                  </div>
+  
+              </header>
+  
+              <div class="content-wrapper container">
+                {% block content %}{% endblock %}
+              </div>
+  
+              <footer>
+                  <div class="container">
+                      <div class="footer clearfix mb-0 text-muted">
+                          <div class="float-start">
+                              <p>2023 &copy; Travel Locations in Sri Lanka Recommendation</p>
+                          </div>
+                          <div class="float-end">
+                              <p>Crafted with <span class="text-danger"><i class="bi bi-heart"></i></span> by <a
+                                  href="">Hansa Wijesinghe</a></p>
+                          </div>
+                      </div>
+                  </div>
+              </footer>
+          </div>
+      </div>
+<script src="static/js/bootstrap.js"></script>
+<script src="static/js/app.js"></script>
+<script src="static/js/pages/horizontal-layout.js"></script>
+
+<script src="static/extensions/apexcharts/apexcharts.min.js"></script>
+<script src="static/js/pages/dashboard.js"></script>
       </body>
 </html>

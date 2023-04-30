@@ -1,37 +1,64 @@
 {% extends "base.html" %}
 
-{% block title %}Get Recommendations{% endblock %}
+{% block title %}Get Recommendations - Travel Locations in Sri Lanka Recommendation{% endblock %}
 
 {% block content %}
-  <h2>Enter your preferences:</h2>
-  <form method="POST" action="/recommend">
-
-		<label for="input_type">Type of location:</label><br>
-        <select id="input_type" name="input_type">
-            {% for type in input_types %}
-            <option value="{{ type }}">{{ type }}</option>
-            {% endfor %}
-        </select><br><br>
-        <label for="input_grade">Grade of location:</label><br>
-        <select id="input_grade" name="input_grade">
+<div class="page-heading">
+    <h3>Enter your preferences:</h3>
+</div>
+<div class="card">
+    <div class="card-content">
+        <div class="card-body">
+            <form class="form form-vertical" method="POST" action="/recommend">
+                <div class="form-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="input_type">Type of location:</label><br>
+                                <select class="form-control" id="input_type" name="input_type">
+                                    {% for type in input_types %}
+                                    <option value="{{ type }}">{{ type }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="input_grade">Grade of location:</label><br>
+        <select class="form-control" id="input_grade" name="input_grade">
             {% for grade in input_grades %}
             <option value="{{ grade }}">{{ grade }}</option>
             {% endfor %}
-        </select><br><br>
-        <label for="input_district">District of location:</label><br>
-        <select id="input_district" name="input_district">
+        </select>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="input_district">District of location:</label><br>
+        <select class="form-control" id="input_district" name="input_district">
             {% for district in input_districts %}
             <option value="{{ district }}">{{ district }}</option>
             {% endfor %}
-        </select><br><br>
-        <label for="input_nationality">Reviewer Nationality:</label><br>
-        <select id="input_nationality" name="input_nationality">
+        </select>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="input_nationality">Reviewer Nationality:</label><br>
+        <select class="form-control" id="input_nationality" name="input_nationality">
             {% for nationality in reviewer_nationalities %}
             <option value="{{ nationality }}">{{ nationality }}</option>
             {% endfor %}
-        </select><br><br>
-
-
-      <input type="submit" value="Submit" />
-    </form>
+        </select>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary me-1 mb-1">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -1,21 +1,85 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Recommended Locations</title>
-</head>
-<body>
-	<h1>Recommended Locations:</h1>
-	{% if top_rec_names|length > 0 %}
-		<ul>
-			{% for recommendation in top_rec_names %}
-				<li>{{ recommendation }}</li>
-			{% endfor %}
-		</ul>
-	{% else %}
-		<p>No recommendations
-	{% endif %}
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Top Recommendations - Travel Locations in Sri Lanka Recommendation{% endblock %}
+
+{% block content %}
+<div class="page-heading">
+    <h3>Top Recommendations</h3>
+</div>
+<section class="section">
+	<div class="row" id="table-hover-row">
+		<div class="col-12">
+			<div class="card">
+				<div class="card-content">
+					<!-- table hover -->
+					<div class="table-responsive">
+						<table class="table table-hover mb-0">
+							{% if top_rec_names|length > 0 %}
+							<thead>
+								<tr>
+									<th>Name</th>
+									<th>Location</th>
+									<th>District</th>
+									<th>Directions</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for recommendation in top_rec_names %}
+								<tr>
+									<td class="text-bold-500">{{ recommendation }}</td>
+									<td>{{ lat }} {{ long }}</td>
+									<td>{{ district[0] }}</td>
+									<td>
+										<button type="button" class="btn btn-primary" onclick="initMap('{{ rec_lats }}', '{{ rec_longs }}')">Get Directions</button>
+									</td>
+								</tr>
+								{% endfor %}
+							</tbody>
+							{% else %}
+							<p>No recommendations</p>	
+						{% endif %}
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<section class="section">
+	<div class="row">
+		<div class="col-12">
+			<div class="card">
+				<div class="card-header">
+					<h5 class="card-title">Location Details</h5>
+				</div>
+				<div class="card-body">
+					<div id="map"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<script async
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCkEdUgcxQQIozkgVhSUz7vbgLDc644tPE&callback=initMap">
+</script>
+<script>
+  function initMap(rec_lats, rec_longs) {
+  var myLatLng = {lat: rec_lats, lng: rec_longs};
+
+  console.log(myLatLng);
+
+  var map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 10,
+    center: { lat: parseFloat(rec_lats), lng: parseFloat(rec_longs) },
+  });
+
+  var marker = new google.maps.Marker({
+    position: { lat: parseFloat(rec_lats), lng: parseFloat(rec_longs) },
+    map: map,
+    title: 'My Location'
+  });
+}
+
+</script>
+
+{% endblock %}

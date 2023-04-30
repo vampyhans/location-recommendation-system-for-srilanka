@@ -160,8 +160,13 @@ def recommend():
     # Get longitudes and latitudes of recommended locations
     rec_lats = df[df['Name'].isin(rec_names)]['Lat'].tolist()
     rec_longs = df[df['Name'].isin(rec_names)]['Lon'].tolist()
+    district = hf[df['Name'].isin(rec_names)]['District'].tolist()
 
-    return render_template('recommendations.html', top_rec_names=rec_names)
+    return render_template('recommendations.html', top_rec_names=rec_names, rec_lats=rec_lats[0], rec_longs=rec_longs[0], district=district)
+
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

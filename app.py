@@ -5,10 +5,13 @@ import os
 from forms import RegistrationForm, LoginForm
 from flask_bcrypt import Bcrypt
 from functools import wraps
+from mysql.connector.errors import Error
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import LabelEncoder
 from sklearn.neighbors import NearestNeighbors
 import mysql.connector
+import sys
+print(sys.path)
 
 app = Flask(__name__)
 
@@ -89,33 +92,45 @@ def index():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
-    if form.validate_on_submit():
-        username = form.username.data
-        email = form.email.data
-        password = form.password.data
-        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-        mycursor.execute("INSERT INTO users (username, email, password) VALUES (%s, %s, %s)", (username, email, hashed_password))
-        mydb.commit()  # fix here
-        mycursor.close()
-        return redirect(url_for('index'))
-    return render_template('register.html', form=form)
+
+    try:
+        if form.validate_on_submit():
+            username = form.username.data
+            email = form.email.data
+            password = form.password.data
+            hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+            mycursor = mydb.cursor()
+            mycursor.execute("INSERT INTO users (username, email, password) VALUES (%s, %s, %s)", (username, email, hashed_password))
+            mydb.commit()
+            mycursor.close()
+            return redirect(url_for('index'))
+        return render_template('register.html', form=form)
+    except Error as e:
+        # Handle the exception and display an error message to the user
+        return render_template('error.html', error=str(e))
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
-    if form.validate_on_submit():
-        email = form.email.data
-        password = form.password.data
-        mycursor = mydb.cursor()
-        mycursor.execute("SELECT * FROM users WHERE email = %s", (email,))
-        user = mycursor.fetchone()
-        mycursor.close()
-        if user and bcrypt.check_password_hash(user[3], password):
-            session['email'] = user[2]
-            return redirect(url_for('index'))
-        else:
-            return render_template('login.html', form=form, error='Invalid email or password')
-    return render_template('login.html', form=form)
+
+    try:
+        if form.validate_on_submit():
+            email = form.email.data
+            password = form.password.data
+            mycursor = mydb.cursor()
+            mycursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+            user = mycursor.fetchone()
+            mycursor.close()
+            if user and bcrypt.check_password_hash(user[3], password):
+                session['email'] = user[1]
+                return redirect(url_for('index'))
+            else:
+                return render_template('login.html', form=form, error='Invalid email or password')
+        return render_template('login.html', form=form)
+    except Error as e:
+        # Handle the exception and display an error message to the user
+        return render_template('error.html', error=str(e))
 
 
 
@@ -127,42 +142,47 @@ def logout():
 @app.route('/recommend', methods=['POST'])
 @login_required
 def recommend():
+    try:
+        # Get user inputs
+        input_type = le_type.transform([request.form['input_type']])[0]
+        input_district = le_district.transform([request.form['input_district']])[0]
+        input_grade = le_grade.transform([request.form['input_grade']])[0]
+        input_nationality = le_nationality.transform([request.form['input_nationality']])[0]
 
-    # Get user inputs
-    input_type = le_type.transform([request.form['input_type']])[0]
-    input_district = le_district.transform([request.form['input_district']])[0]
-    input_grade = le_grade.transform([request.form['input_grade']])[0]
-    input_nationality = le_nationality.transform([request.form['input_nationality']])[0]
+        # Filter DataFrame based on user_item.index
+        df_filtered = df.loc[user_item.index]
 
-   # Filter DataFrame based on user_item.index
-    df_filtered = df.loc[user_item.index]
+        # Create user vector
+        user_vector = np.zeros(len(df['Name'].unique()))
+        valid_rows = (df_filtered['Type'] == input_type) & (df_filtered['District'] == input_district) & (df_filtered['Grade'] == input_grade) & (df_filtered['Reviewer_Nationality'] == input_nationality)
+        user_vector[df_filtered.index[valid_rows]] = 1
 
-   # Create user vector
-    user_vector = np.zeros(len(df['Name'].unique()))
-    valid_rows = (df_filtered['Type'] == input_type) & (df_filtered['District'] == input_district) & (df_filtered['Grade'] == input_grade) & (df_filtered['Reviewer_Nationality'] == input_nationality)
-    user_vector[df_filtered.index[valid_rows]] = 1
+        # Find similar users using k-NN
+        user_vector = user_vector.reshape(1, -1)
+        _, user_indices = knn.kneighbors(user_vector)
 
+        # Create a boolean mask to select only valid elements of user_indices
+        mask = user_indices < len(user_item)
 
-    #Find similar users using k-NN
-    user_vector = user_vector.reshape(1, -1)
-    _, user_indices = knn.kneighbors(user_vector)
+        # Apply the mask to user_indices
+        user_indices = user_indices[mask]
 
-    # Create a boolean mask to select only valid elements of user_indices
-    mask = user_indices < len(user_item)
+        # Get recommended locations
+        rec_indices = np.where(user_item.iloc[user_indices[0]].mean(axis=0) > 0)[0]
+        rec_names = user_item.columns[rec_indices][:5].tolist()
 
-    # Apply the mask to user_indices
-    user_indices = user_indices[mask]
+        # Get longitudes and latitudes of recommended locations
+        rec_lats = df[df['Name'].isin(rec_names)]['Lat'].tolist()
+        rec_longs = df[df['Name'].isin(rec_names)]['Lon'].tolist()
+        district = hf[df['Name'].isin(rec_names)]['District'].tolist()
 
-    # Get recommended locations
-    rec_indices = np.where(user_item.iloc[user_indices[0]].mean(axis=0) > 0)[0]
-    rec_names = user_item.columns[rec_indices][:5].tolist()
+        return render_template('recommendations.html', top_rec_names=rec_names, rec_lats=rec_lats[0], rec_longs=rec_longs[0], district=district)
 
-    # Get longitudes and latitudes of recommended locations
-    rec_lats = df[df['Name'].isin(rec_names)]['Lat'].tolist()
-    rec_longs = df[df['Name'].isin(rec_names)]['Lon'].tolist()
-    district = hf[df['Name'].isin(rec_names)]['District'].tolist()
+    except Exception as e:
+        # Log the exception and return an error message to the user
+        print(f"An error occurred: {e}")
+        return render_template('error.html', error='An error occurred. Please try again later.')
 
-    return render_template('recommendations.html', top_rec_names=rec_names, rec_lats=rec_lats[0], rec_longs=rec_longs[0], district=district)
 
 
 

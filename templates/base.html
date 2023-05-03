@@ -18,19 +18,20 @@
                   <div class="header-top">
                       <div class="container">
                           <div class="logo">
-                              <a href="index.html"><img src="assets/images/logo/logo.svg" alt="Logo"></a>
+                              <a href="index.html"><img src="static/images/logo/logo.svg" alt="Logo"></a>
                           </div>
                           <div class="header-top-right">
   
                               <div class="dropdown">
                                   <a href="#" id="topbarUserDropdown" class="user-dropdown d-flex align-items-center dropend dropdown-toggle " data-bs-toggle="dropdown" aria-expanded="false">
                                       <div class="avatar avatar-md2" >
-                                          <img src="assets/images/faces/1.jpg" alt="Avatar">
+                                          <img src="static/images/faces/1.jpg" alt="Avatar">
                                       </div>
+                                      {% if 'email' in session %}
                                       <div class="text">
-                                          <h6 class="user-dropdown-name">John Ducky</h6>
-                                          <p class="user-dropdown-status text-sm text-muted">Member</p>
+                                          <h6 class="user-dropdown-name">{{ session['email'] }}</h6>
                                       </div>
+                                      {% endif %}
                                   </a>
                                   <ul class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="topbarUserDropdown">
                                     <li><a class="dropdown-item" href="#">My Account</a></li>

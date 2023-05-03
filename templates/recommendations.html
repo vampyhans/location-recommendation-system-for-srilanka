@@ -53,15 +53,16 @@
 					<h5 class="card-title">Location Details</h5>
 				</div>
 				<div class="card-body">
-					<div id="map"></div>
+					<div id="map" style="width:100%;height:400px;"></div>
 				</div>
 			</div>
 		</div>
 	</div>
 </section>
 <script async
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCkEdUgcxQQIozkgVhSUz7vbgLDc644tPE&callback=initMap">
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC7S9DFmxe2_gjxPZc4nmAX3Hcc6g6uvrg&callback=initMap">
 </script>
+<!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC7S9DFmxe2_gjxPZc4nmAX3Hcc6g6uvrg"></script> -->
 <script>
   function initMap(rec_lats, rec_longs) {
   var myLatLng = {lat: rec_lats, lng: rec_longs};
@@ -69,7 +70,7 @@
   console.log(myLatLng);
 
   var map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 10,
+    zoom: 5,
     center: { lat: parseFloat(rec_lats), lng: parseFloat(rec_longs) },
   });
 

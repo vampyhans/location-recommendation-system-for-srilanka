@@ -1,30 +1,15 @@
-from flask import url_for
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SubmitField
+from wtforms.validators import DataRequired, Email, EqualTo
 
-def test_register(client):
-    # Simulate a GET request to the register page
-    response = client.get('/register')
+class RegistrationForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Sign Up')
 
-    # Check that the response contains the registration form
-    assert b'Sign Up' in response.data
-
-    # Simulate a POST request to the register page with valid data
-    response = client.post('/register', data={
-        'username': 'testuser',
-        'email': 'testuser@example.com',
-        'password': 'testpassword',
-        'confirm_password': 'testpassword'
-    })
-
-    # Check that the response redirects to the index page
-    assert response.status_code == 302
-    assert response.location == url_for('login', _external=True)
-
-    # # Simulate a POST request to the login page with the credentials of the newly registered user
-    # response = client.post('/login', data={
-    #     'username': 'testuser',
-    #     'password': 'testpassword'
-    # })
-
-    # # Check that the response redirects to the index page, indicating successful authentication
-    # assert response.status_code == 302
-    # assert response.location == url_for('index', _external=True)
+class LoginForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    submit = SubmitField('Log In')

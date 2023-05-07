@@ -23,6 +23,6 @@ scipy
 six==1.16.0
 threadpoolctl==3.1.0
 tzdata==2023.3
-Werkzeug==2.3.3
+Werkzeug
 WTForms==3.0.1
 zipp==3.15.0
